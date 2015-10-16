@@ -1,0 +1,309 @@
+<!-- We are still creating this components -->
+<link rel="import" href="../polymer/polymer.html" />
+  
+<link rel="import" href="../iron-flex-layout/classes/iron-flex-layout.html" />
+<link rel="import" href="../iron-icons/iron-icons.html" />
+<!--
+    `<t-creditcard>` is a polymer component that generates a playground for interacting with components.
+
+    <div class="demo-canvas">
+        
+    </div>
+
+    <t-creditcard metadata-source="metadata url" property-source="property url" component="component name">
+        
+        <div class="component">
+            
+            'component template'
+        </div>
+    </t-creditcard>     
+-->
+<dom-module id="t-itinerary">
+    <template>
+        <style>
+            :host {
+                width: 100%;
+                font-family: var(--primary-font-family,'Open sans');
+                font-size: var(--font-12,12px);
+                -webkit-box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                box-sizing: border-box;
+                color: var(--grey-six,#333333);
+            }
+
+            .textRight {
+                text-align: right;
+            }
+
+            .textLeft {
+                text-align: left;
+            }
+
+            .vertical-margin {
+                margin-bottom: 10px;
+            }
+
+            .sectionHeader {
+                background: var(--grey-two,#eeeeee);
+                padding: 20px 10px;
+            }
+
+            :host([is-trip-summary]) .sectionHeader {
+                background: transparent;
+                padding: 5px 0;
+                margin: 0 10px;
+                border-bottom: 1px solid;
+                border-color: var(--grey-two,#eeeeee);
+            }
+
+            .route {
+                font-size: var(--font-12,12px);
+                font-weight: 600;
+            }
+
+            .section {
+                padding: 20px 10px;
+            }
+
+            .flightTiming {
+                font-size: var(--font-16,16px);
+                font-weight: 600;
+            }
+
+            .cityCodes {
+                font-weight: normal;
+            }
+
+            .durationSection, .layoverText {
+                color: var(--grey-nine,#999999);
+            }
+
+            .totalDuration, .layoverText {
+                margin: 0 10px;
+            }
+
+            .layover {
+                margin: 20px 0;
+            }
+
+                .layover .flex {
+                    height: 1px;
+                    border-top: 1px dotted;
+                    border-color: var(--grey-two,#eeeeee);
+                }
+
+            .flightDetails {
+                color: var(--grey-nine,#999999);
+                margin-bottom: 5px;
+            }
+
+                .flightDetails img {
+                    width: 16px;
+                    height: 16px;
+                    margin-right: 5px;
+                }
+
+            .hyphen {
+                color: var(--grey-three,#bbbbbb);
+                width: 20px;
+                height: 20px;
+            }
+
+            .note {
+                padding: 10px;
+                border-top: 1px solid;
+                border-color: var(--grey-two,#eeeeee);
+            }
+
+                .note .info {
+                    padding: 0;
+                    margin: 0;
+                    padding-left: 10px;
+                    margin-left: 10px;
+                    color: var(--grey-nine,#999999);
+                }
+        </style>
+        <template is="dom-repeat" items="[[flightData]]">
+            <div class="sectionHeader layout horizontal center">
+                <div class="route">
+                    <span>{{item.departureLocation.cityName}}</span> - <span>{{item.arrivalLocation.cityName}}</span>
+                </div>
+                <div class="flex"></div>
+                <div class="totalTime">{{_getFormattedTiming(item.totalJourneyDuration)}}</div>
+            </div>
+            <div class="section">
+                <template is="dom-repeat" items="[[item.segments]]">
+                    <div class="layout horizontal center layover" hidden$={{_checklayover(item.layoverInfo)}}>
+                        <span class="flex"></span>
+                        <span class="layoverText">Layover:&nbsp;<span>{{_getFormattedTiming(item.layoverInfo.duration)}}</span></span>
+                        <span class="flex"></span>
+                    </div>
+                    <div class="flightDetails layout horizontal center">
+                        <img src$="{{item.airline.imageUrl}}" alt="">
+                        <span>{{item.airline.name}}</span>
+                        <span>&nbsp;</span>
+                        <span>{{item.airline.code}}</span>
+                        <span>&nbsp;</span>
+                        <span>{{item.flightNumber}}</span>
+                    </div>
+                    <div class="layout horizontal">
+                        <div class="layout vertical textRight flex">
+                            <span class="flex textRight flightTiming">
+                                <span >{{_getTime(item.departureTime.systemDateTime)}}</span>
+                                <span class="cityCodes">{{item.departureAirport.code}}</span>
+                            </span>
+                            <span class="date flex durationSection">{{_getDate(item.departureTime.date)}}</span>
+                        </div>
+                        <div class="layout vertical center " style="width:100px">
+                            <span>
+                                <iron-icon class="hyphen" icon="schedule"></iron-icon>
+                            </span>
+                            <span class="flex"></span>
+                            <span class="totalDuration durationSection self-center">{{_getFormattedTiming(item.flightDuration)}}</span>
+                        </div>
+                        <div class="layout vertical textLeft flex">
+                            <span class="flex flightTiming">
+                            <span class="cityCodes">{{item.arrivalAirport.code}}</span>
+                            <span>{{_getTime(item.arrivalTime.systemDateTime)}}</span>
+                            </span>
+                            <span class="date flex textLeft durationSection">{{_getDate(item.arrivalTime.date)}}</span>
+                        </div>
+                    </div>
+                             
+                </template>
+            </div>
+               <div class="note" hidden$={{_checkNotes(item)}}>
+                 <div class="info">
+                    <div>{{_getFlightText(item)}}</div>
+                    <div hidden$="{{_hasNoTechStops(item)}}">This itinerary contains one or more tech stops. Insert appropriate tech stop messaging here.</div>
+                </div>
+            </div>
+
+        </template>
+    </template>
+</dom-module>
+<script>
+    Polymer({
+
+        is: 't-itinerary',
+
+        properties: {
+
+            flightData: {
+                type: Array,
+                value: function () {
+                    return [];
+                },
+                notify: true
+            },
+
+            isTripSummary: {
+                type: Boolean,
+                value: false,
+                reflectToAttribute: true
+            },
+
+            _flightNumbers: {
+                type: Array
+            },
+
+            _operatingAirlines: {
+                type: Array
+            }
+
+        },
+
+
+        _checklayover: function (layover) {
+            return layover == null;
+        },
+        _getDate: function (date) {
+            return date.slice(0, 11);
+        },
+
+        _getTime: function (time) {
+            return time.slice(11, 16);
+        },
+
+        _hasNoTechStops: function(item){
+            var hasNoTechStops = true;
+             item.segments.forEach(function (segment) {
+                if (segment.id < 0)
+                   hasNoTechStops = false;
+            });
+             return hasNoTechStops;
+        },
+
+        _checkNotes: function(item){
+            var hasNote = false;
+             item.segments.forEach(function (segment) {
+                if(segment.operatingAirline.code != segment.airline.code)
+                {
+                    hasNote = true;
+                }
+                 if (segment.id < 0)
+                   hasNote = true;
+            });
+             return (!this.isTripSummary && !hasNote);
+        },
+
+        _getFlightInformation: function (item) {
+            var component = this;
+            var response = {};
+            var _flightNumbers = [];
+            var _operatingAirlines = [];
+            item.segments.forEach(function (segment) {
+                if(segment.operatingAirline.code != segment.airline.code)
+                {
+                    _flightNumbers.push(segment.flightNumber);
+                    _operatingAirlines.push(segment.operatingAirline.name);
+                }
+            });
+
+            response.flightNumbers = _flightNumbers;
+            response.operatingAirlines = _operatingAirlines;
+            return response;
+        },
+
+        _getFlightText: function (item) {
+            var response = this._getFlightInformation(item);
+            if(response.operatingAirlines.length != 0){
+                var info = "Flight no. ";
+                var numberOfFlights = response.flightNumbers.length;
+
+                response.flightNumbers.forEach(function (flight, index) {
+                    info = info + flight;
+                    if (index != numberOfFlights - 1)
+                        info = info + ", ";
+                });
+                if (numberOfFlights > 1)
+                    info = info + " are operated by ";
+                else
+                    info = info + " is operated by ";
+
+                response.operatingAirlines.forEach(function (airline, index) {
+                    info = info + airline;
+                    if (index != numberOfFlights - 1)
+                        info = info + ", ";
+                });
+                info = info + ".";
+                return info;
+            }
+        },
+
+        _getFormattedTiming: function (time) {
+            var t = "";
+            var day = time / (24 * 60);
+            var hour = (time % (24 * 60)) / 60;
+            var minute = (time % (24 * 60)) % 60;
+            if (parseInt(day) > 0)
+                t = t + parseInt(day) + "d ";
+            if (parseInt(hour) > 0)
+                t = t + parseInt(hour) + "h ";
+            if (parseInt(minute) > 0)
+                t = t + parseInt(minute) + "m ";
+            return t;
+        }
+
+    })
+</script>
