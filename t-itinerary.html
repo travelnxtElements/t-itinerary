@@ -86,22 +86,22 @@
                 margin: 20px 0;
             }
 
-                .layover .flex {
-                    height: 1px;
-                    border-top: 1px dotted;
-                    border-color: var(--grey-two,#eeeeee);
-                }
+            .layover .flex {
+                height: 1px;
+                border-top: 1px dotted;
+                border-color: var(--grey-two,#eeeeee);
+            }
 
             .flightDetails {
                 color: var(--grey-nine,#999999);
                 margin-bottom: 5px;
             }
 
-                .flightDetails img {
-                    width: 16px;
-                    height: 16px;
-                    margin-right: 5px;
-                }
+            .flightDetails img {
+                width: 16px;
+                height: 16px;
+                margin-right: 5px;
+            }
 
             .hyphen {
                 color: var(--grey-three,#bbbbbb);
@@ -114,14 +114,22 @@
                 border-top: 1px solid;
                 border-color: var(--grey-two,#eeeeee);
             }
-
-                .note .info {
-                    padding: 0;
-                    margin: 0;
-                    padding-left: 10px;
-                    margin-left: 10px;
-                    color: var(--grey-nine,#999999);
-                }
+            :host([is-trip-summary]) .note {
+                padding: 10px 0;
+            }
+            .note .info {
+                padding: 0;
+                margin: 0;
+                padding-left: 10px;
+                color: var(--grey-nine,#999999);
+                position: relative;
+            }
+            .info div::before{
+                content:"•";
+                color: #999999;       
+                position: absolute;
+                left: 0;
+            }
         </style>
         <template is="dom-repeat" items="[[flightData]]">
             <div class="sectionHeader layout horizontal center">
@@ -132,50 +140,50 @@
                 <div class="totalTime">{{_getFormattedTiming(item.totalJourneyDuration)}}</div>
             </div>
             <div class="section">
-                <template is="dom-repeat" items="[[item.segments]]">
-                    <div class="layout horizontal center layover" hidden$={{_checklayover(item.layoverInfo)}}>
+                <template is="dom-repeat" items="[[item.segments]]" as="segment">
+                    <div class="layout horizontal center layover" hidden$={{_checklayover(segment.layoverInfo)}}>
                         <span class="flex"></span>
-                        <span class="layoverText">Layover:&nbsp;<span>{{_getFormattedTiming(item.layoverInfo.duration)}}</span></span>
+                        <span class="layoverText">Layover:&nbsp;<span>{{_getFormattedTiming(segment.layoverInfo.Duration)}}</span></span>
                         <span class="flex"></span>
                     </div>
                     <div class="flightDetails layout horizontal center">
-                        <img src$="{{item.airline.imageUrl}}" alt="">
-                        <span>{{item.airline.name}}</span>
+                        <img src$="{{segment.airline.imageUrl}}" alt="">
+                        <span>{{segment.airline.name}}</span>
                         <span>&nbsp;</span>
-                        <span>{{item.airline.code}}</span>
+                        <span>{{segment.airline.code}}</span>
                         <span>&nbsp;</span>
-                        <span>{{item.flightNumber}}</span>
+                        <span>{{segment.flightNumber}}</span>
                     </div>
                     <div class="layout horizontal">
                         <div class="layout vertical textRight flex">
                             <span class="flex textRight flightTiming">
-                                <span >{{_getTime(item.departureTime.systemDateTime)}}</span>
-                                <span class="cityCodes">{{item.departureAirport.code}}</span>
+                                <span >{{_getTime(segment.departureTime.systemDateTime)}}</span>
+                                <span class="cityCodes">{{segment.departureAirport.code}}</span>
                             </span>
-                            <span class="date flex durationSection">{{_getDate(item.departureTime.date)}}</span>
+                            <span class="date flex durationSection">{{_getDate(segment.departureTime.date)}}</span>
                         </div>
                         <div class="layout vertical center " style="width:100px">
                             <span>
                                 <iron-icon class="hyphen" icon="schedule"></iron-icon>
                             </span>
                             <span class="flex"></span>
-                            <span class="totalDuration durationSection self-center">{{_getFormattedTiming(item.flightDuration)}}</span>
+                            <span class="totalDuration durationSection self-center">{{_getFormattedTiming(segment.flightDuration)}}</span>
                         </div>
                         <div class="layout vertical textLeft flex">
                             <span class="flex flightTiming">
-                            <span class="cityCodes">{{item.arrivalAirport.code}}</span>
-                            <span>{{_getTime(item.arrivalTime.systemDateTime)}}</span>
+                            <span class="cityCodes">{{segment.arrivalAirport.code}}</span>
+                            <span>{{_getTime(segment.arrivalTime.systemDateTime)}}</span>
                             </span>
-                            <span class="date flex textLeft durationSection">{{_getDate(item.arrivalTime.date)}}</span>
+                            <span class="date flex textLeft durationSection">{{_getDate(segment.arrivalTime.date)}}</span>
                         </div>
                     </div>
                              
                 </template>
             </div>
-               <div class="note" hidden$={{_checkNotes(item)}}>
+               <div id="note" class="note" hidden$={{_checkNotes(item)}}>
                  <div class="info">
                     <div>{{_getFlightText(item)}}</div>
-                    <div hidden$="{{_hasNoTechStops(item)}}">This itinerary contains one or more tech stops. Insert appropriate tech stop messaging here.</div>
+                    <div hidden$="{{_hasNoTechStops(item)}}">This itinerary contains one or more tech stops.</div>
                 </div>
             </div>
 
@@ -197,12 +205,6 @@
                 notify: true
             },
 
-            isTripSummary: {
-                type: Boolean,
-                value: false,
-                reflectToAttribute: true
-            },
-
             _flightNumbers: {
                 type: Array
             },
@@ -217,13 +219,23 @@
         _checklayover: function (layover) {
             return layover == null;
         },
+        
         _getDate: function (date) {
+
             return date.slice(0, 11);
         },
 
-        _getTime: function (time) {
-            return time.slice(11, 16);
+            _getTime: function(dateTime) {
+            var jsDate = new Date(dateTime);
+
+            var hours = jsDate.getHours();
+            hours = hours > 9 ? hours : '0' + hours;
+
+            var minutes = jsDate.getMinutes();
+            minutes = (minutes > 9 ? minutes : '0' + minutes);
+            return hours + ":" + minutes;
         },
+           
 
         _hasNoTechStops: function(item){
             var hasNoTechStops = true;
@@ -236,15 +248,15 @@
 
         _checkNotes: function(item){
             var hasNote = false;
-             item.segments.forEach(function (segment) {
-                if(segment.operatingAirline.code != segment.airline.code)
-                {
+            item.segments.forEach(function (segment) {
+                if(segment.operatingAirline.code != segment.airline.code && segment.operatingAirline.name !== null){
                     hasNote = true;
                 }
-                 if (segment.id < 0)
+                if (segment.id < 0){
                    hasNote = true;
+                }
             });
-             return (!this.isTripSummary && !hasNote);
+             return (!hasNote);
         },
 
         _getFlightInformation: function (item) {
@@ -253,7 +265,7 @@
             var _flightNumbers = [];
             var _operatingAirlines = [];
             item.segments.forEach(function (segment) {
-                if(segment.operatingAirline.code != segment.airline.code)
+                if(segment.operatingAirline.code != segment.airline.code && segment.operatingAirline.name !== null)
                 {
                     _flightNumbers.push(segment.flightNumber);
                     _operatingAirlines.push(segment.operatingAirline.name);
