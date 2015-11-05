@@ -265,7 +265,7 @@
             var _flightNumbers = [];
             var _operatingAirlines = [];
             item.segments.forEach(function (segment) {
-                if(segment.operatingAirline.code != segment.airline.code && segment.operatingAirline.name !== null)
+                if(segment.operatingAirline != null && segment.operatingAirline.code != segment.airline.code && segment.operatingAirline.name !== null)
                 {
                     _flightNumbers.push(segment.flightNumber);
                     _operatingAirlines.push(segment.operatingAirline.name);
