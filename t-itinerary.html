@@ -81,7 +81,11 @@
             .totalDuration, .layoverText {
                 margin: 0 10px;
             }
-
+            .techStopStar{
+                vertical-align: text-top;
+                padding-right: 2px;
+                font-weight: bold;
+            }
             .layover {
                 margin: 20px 0;
             }
@@ -118,17 +122,7 @@
                 padding: 10px 0;
             }
             .note .info {
-                padding: 0;
-                margin: 0;
-                padding-left: 10px;
                 color: var(--grey-nine,#999999);
-                position: relative;
-            }
-            .info div::before{
-                content:"•";
-                color: #999999;       
-                position: absolute;
-                left: 0;
             }
         </style>
         <template is="dom-repeat" items="[[flightData]]">
@@ -143,21 +137,28 @@
                 <template is="dom-repeat" items="[[item.segments]]" as="segment">
                     <div class="layout horizontal center layover" hidden$={{_checklayover(segment.layoverInfo)}}>
                         <span class="flex"></span>
-                        <span class="layoverText">Layover:&nbsp;<span>{{_getFormattedTiming(segment.layoverInfo.Duration)}}</span></span>
+                        <span class="layoverText">Layover:&nbsp;<span>{{_getFormattedTiming(segment.layoverInfo.Duration)}}</span><span class="techStopStar" hidden$={{_checkTechStop(segment)}}>*</span></span>
                         <span class="flex"></span>
                     </div>
                     <div class="flightDetails layout horizontal center">
                         <img src$="{{segment.airline.imageUrl}}" alt="">
-                        <span>{{segment.airline.name}}</span>
-                        <span>&nbsp;</span>
-                        <span>{{segment.airline.code}}</span>
-                        <span>&nbsp;</span>
-                        <span>{{segment.flightNumber}}</span>
+                        <div class="layout vertical">
+                            <div class="layout horizontal">
+                                <span>{{segment.airline.name}}</span>
+                                <span>&nbsp;</span>
+                                <span>{{segment.airline.code}}</span>
+                                <span>&nbsp;</span>
+                                <span>{{segment.flightNumber}}</span>
+                            </div>
+                            <template is="dom-if" if="{{_checkOperated(segment)}}">
+                                <div>Operated by <span>{{segment.operatingAirline.name}}</span>.</div>
+                            </template>
+                        </div>
                     </div>
                     <div class="layout horizontal">
                         <div class="layout vertical textRight flex">
                             <span class="flex textRight flightTiming">
-                                <span >{{_getTime(segment.departureTime.systemDateTime)}}</span>
+                                <span>{{_getTime(segment.departureTime.systemDateTime)}}</span>
                                 <span class="cityCodes">{{segment.departureAirport.code}}</span>
                             </span>
                             <span class="date flex durationSection">{{_getDate(segment.departureTime.date)}}</span>
@@ -177,13 +178,12 @@
                             <span class="date flex textLeft durationSection">{{_getDate(segment.arrivalTime.date)}}</span>
                         </div>
                     </div>
-                             
                 </template>
             </div>
                <div id="note" class="note" hidden$={{_checkNotes(item)}}>
                  <div class="info">
-                    <div>{{_getFlightText(item)}}</div>
-                    <div hidden$="{{_hasNoTechStops(item)}}">This itinerary contains one or more tech stops.</div>
+                    <!-- <div>{{_getFlightText(item)}}</div> -->
+                    <div hidden$="{{_hasNoTechStops(item)}}"><span class="techStopStar">*</span>Possible change of flight - connecting flight may depart from a different terminal.</div>
                 </div>
             </div>
 
@@ -211,6 +211,11 @@
 
             _operatingAirlines: {
                 type: Array
+            },
+
+            _checkOperated: {
+                type:Boolean,
+                value:false
             }
 
         },
@@ -225,7 +230,7 @@
             return date.slice(0, 11);
         },
 
-            _getTime: function(dateTime) {
+        _getTime: function(dateTime) {
             var jsDate = new Date(dateTime);
 
             var hours = jsDate.getHours();
@@ -235,7 +240,11 @@
             minutes = (minutes > 9 ? minutes : '0' + minutes);
             return hours + ":" + minutes;
         },
-           
+        
+        /*To check tech stops at a segment level*/
+        _checkTechStop:function(segment){
+            return segment.id < 0?false:true;
+        },
 
         _hasNoTechStops: function(item){
             var hasNoTechStops = true;
@@ -249,9 +258,6 @@
         _checkNotes: function(item){
             var hasNote = false;
             item.segments.forEach(function (segment) {
-                if(segment.operatingAirline.code != segment.airline.code && segment.operatingAirline.name !== null){
-                    hasNote = true;
-                }
                 if (segment.id < 0){
                    hasNote = true;
                 }
@@ -277,30 +283,11 @@
             return response;
         },
 
-        _getFlightText: function (item) {
-            var response = this._getFlightInformation(item);
-            if(response.operatingAirlines.length != 0){
-                var info = "Flight no. ";
-                var numberOfFlights = response.flightNumbers.length;
-
-                response.flightNumbers.forEach(function (flight, index) {
-                    info = info + flight;
-                    if (index != numberOfFlights - 1)
-                        info = info + ", ";
-                });
-                if (numberOfFlights > 1)
-                    info = info + " are operated by ";
-                else
-                    info = info + " is operated by ";
-
-                response.operatingAirlines.forEach(function (airline, index) {
-                    info = info + airline;
-                    if (index != numberOfFlights - 1)
-                        info = info + ", ";
-                });
-                info = info + ".";
-                return info;
+        _checkOperated: function (item) {
+            if(item.airline.code!== item.operatingAirline.code && item.operatingAirline && item.operatingAirline.name){
+                return true;
             }
+            return false;
         },
 
         _getFormattedTiming: function (time) {
@@ -314,7 +301,7 @@
                 t = t + parseInt(hour) + "h ";
             if (parseInt(minute) > 0)
                 t = t + parseInt(minute) + "m ";
-            return t;
+            return t.trim();
         }
 
     })
