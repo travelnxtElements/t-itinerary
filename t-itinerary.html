@@ -99,6 +99,7 @@
             .flightDetails {
                 color: var(--grey-nine,#999999);
                 margin-bottom: 5px;
+                line-height: 1;
             }
 
             .flightDetails img {
@@ -106,9 +107,11 @@
                 height: 16px;
                 margin-right: 5px;
             }
-
+            .operatedText{
+                margin: 2px 0;
+            }
             .hyphen {
-                color: var(--grey-three,#bbbbbb);
+                color: var(--grey-three,#bbbbbb); 
                 width: 20px;
                 height: 20px;
             }
@@ -151,7 +154,7 @@
                                 <span>{{segment.flightNumber}}</span>
                             </div>
                             <template is="dom-if" if="{{_checkOperated(segment)}}">
-                                <div>Operated by <span>{{segment.operatingAirline.name}}</span>.</div>
+                                <div class="operatedText">Operated by <span>{{segment.operatingAirline.name}}</span>.</div>
                             </template>
                         </div>
                     </div>
