@@ -234,14 +234,7 @@
         },
 
         _getTime: function(dateTime) {
-            var jsDate = new Date(dateTime);
-
-            var hours = jsDate.getHours();
-            hours = hours > 9 ? hours : '0' + hours;
-
-            var minutes = jsDate.getMinutes();
-            minutes = (minutes > 9 ? minutes : '0' + minutes);
-            return hours + ":" + minutes;
+            return dateTime.split('T')[1].slice(0, 5);
         },
         
         /*To check tech stops at a segment level*/
