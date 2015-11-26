@@ -138,187 +138,209 @@
         <template is="dom-repeat" items="[[flightData]]">
             <div class="sectionHeader layout horizontal center">
                 <div class="route">
-                    <span>{{item.departureLocation.cityName}}</span> - <span>{{item.arrivalLocation.cityName}}</span>
+                    <span>[[item.departureLocation.cityName]]</span> - <span>[[item.arrivalLocation.cityName]]</span>
                 </div>
                 <div class="flex"></div>
-                <div class="totalTime">{{_getFormattedTiming(item.totalJourneyDuration)}}</div>
+                <div class="totalTime">[[_getFormattedTiming(item.totalJourneyDuration)]]</div>
             </div>
             <div class="section">
                 <template is="dom-repeat" items="[[item.segments]]" as="segment">
-                    <div class="layout horizontal center layover" hidden$={{_checklayover(segment.layoverInfo)}}>
+                    <div class="layout horizontal center layover" hidden$=[[_checklayover(segment.layoverInfo)]]>
                         <span class="flex"></span>
-                        <span class="layoverText">Layover:&nbsp;<span>{{_getFormattedTiming(segment.layoverInfo.Duration)}}</span><span class="techStopStar" hidden$={{_checkTechStop(segment)}}>*</span></span>
+                        <span class="layoverText">Layover:&nbsp;<span>[[_getFormattedTiming(segment.layoverInfo.Duration)]]</span><span class="techStopStar" hidden$=[[_checkTechStop(segment)]]>*</span></span>
                         <span class="flex"></span>
                     </div>
                     <div class="flightDetails layout horizontal center">
-                        <img src$="{{segment.airline.imageUrl}}" alt="">
-                        <div class="layout vertical">
-                            <div class="layout horizontal">
-                                <span>{{segment.airline.name}}</span>
-                                <span>&nbsp;</span>
-                                <span>{{segment.airline.code}}</span>
-                                <span>&nbsp;</span>
-                                <span>{{segment.flightNumber}}</span>
+                        <img src$="[[segment.airline.imageUrl]]" alt="">
+                        <div class="layout vertical flex">
+                            <div class="layout horizontal flex">
+                                <div class="flex">
+                                    <span>[[_getAirlineName(segment)]]</span>
+                                </div>
+                                <div class="end-justified" hidden$="[[_isNotChangeOfGauge(segment)]]">
+                                    <span>[[_getSegmentAirports(segment)]]</span>
+                                    <span>[[_getFormattedTiming(segment.flightDuration)]]</span>
+                                </div>
                             </div>
-                            <template is="dom-if" if="{{_checkOperated(segment)}}">
-                                <div class="operatedText">Operated by <span>{{segment.operatingAirline.name}}</span>.</div>
+                            <template is="dom-if" if="[[_checkOperated(segment)]]">
+                                <div class="operatedText">Operated by <span>[[segment.operatingAirline.name]]</span>.</div>
                             </template>
                         </div>
                     </div>
                     <div class="layout horizontal">
                         <div class="layout vertical textRight flex">
                             <span class="flex textRight flightTiming">
-                                <span>{{_getTime(segment.departureTime)}}</span>
-                            <span class="cityCodes">{{segment.departureAirport.code}}</span>
+                                <span>[[_getTime(segment.departureTime)]]</span>
+                            <span class="cityCodes">[[segment.departureAirport.code]]</span>
                             </span>
-                            <span class="date flex durationSection">{{_getDate(segment.departureTime.date)}}</span>
+                            <span class="date flex durationSection">[[_getDate(segment.departureTime.date)]]</span>
                         </div>
-                        <div class="layout vertical center " style="width:100px">
-                            <span>
+                        <div style="width:100px">
+                            <div  class="layout vertical center " hidden$="[[_isChangeOfGauge(segment)]]">
+
+                            <span >
                                 <iron-icon class="hyphen" icon="schedule"></iron-icon>
                             </span>
                             <span class="flex"></span>
-                            <span class="totalDuration durationSection self-center">{{_getFormattedTiming(segment.flightDuration)}}</span>
+                            <span class="totalDuration durationSection self-center">[[_getFormattedTiming(segment.flightDuration)]]</span>
+                            </div>
+
                         </div>
-                        <div class="layout vertical textLeft flex">
+                        <div class="layout vertical textLeft flex end-justified">
                             <span class="flex flightTiming">
-                            <span class="cityCodes">{{segment.arrivalAirport.code}}</span>
-                            <span>{{_getTime(segment.arrivalTime)}}</span>
+                            <span class="cityCodes">[[segment.arrivalAirport.code]]</span>
+                            <span>[[_getTime(segment.arrivalTime)]]</span>
                             </span>
-                            <span class="date flex textLeft durationSection">{{_getDate(segment.arrivalTime.date)}}</span>
+                            <span class="date flex textLeft durationSection">[[_getDate(segment.arrivalTime.date)]]</span>
                         </div>
                     </div>
                 </template>
             </div>
-            <div id="note" class="note" hidden$={{_checkNotes(item)}}>
+            <div id="note" class="note" hidden$=[[_checkNotes(item)]]>
                 <div class="info">
-                    <!-- <div>{{_getFlightText(item)}}</div> -->
-                    <div hidden$="{{_hasNoTechStops(item)}}"><span class="techStopStar">*</span>Possible change of flight - connecting flight may depart from a different terminal.</div>
+                    <!-- <div>[[_getFlightText(item)]]</div> -->
+                    <div hidden$="[[_hasNoTechStops(item)]]"><span class="techStopStar">*</span>Possible change of flight - connecting flight may depart from a different terminal.</div>
                 </div>
             </div>
         </template>
     </template>
 </dom-module>
 <script>
-Polymer({
+    Polymer({
 
-    is: 't-itinerary',
+        is: 't-itinerary',
 
-    properties: {
+        properties: {
 
-        flightData: {
-            type: Array,
-            value: function() {
-                return [];
+            flightData: {
+                type: Array,
+                value: function () {
+                    return [];
+                },
+                notify: true
             },
-            notify: true
-        },
 
-        _flightNumbers: {
-            type: Array
-        },
+            _flightNumbers: {
+                type: Array
+            },
 
-        _operatingAirlines: {
-            type: Array
-        },
+            _operatingAirlines: {
+                type: Array
+            },
 
-        _checkOperated: {
-            type: Boolean,
-            value: false
-        }
-
-    },
-
-
-    _checklayover: function(layover) {
-        return layover == null;
-    },
-
-    _getDate: function(date) {
-
-        return date.slice(0, 11);
-    },
-
-    _get24HourTime: function(time) {
-        var hours = parseInt(time.substr(0, 2));
-        if (time.indexOf('AM') != -1) {
-            if (hours < 10)
-                time = '0' + time;
-            if(hours == 12)
-                time = time.replace('12', '00');
-        }
-        if (time.indexOf('PM') != -1 && hours < 12) {
-            time = time.replace(hours, (hours + 12));
-        }
-        return time.replace(/(AM|PM)/, '');
-    },
-
-    _getTime: function(dateTime) {
-        var time = this._get24HourTime(dateTime.time);
-        return time;
-    },
-
-    /*To check tech stops at a segment level*/
-    _checkTechStop: function(segment) {
-        return segment.id < 0 ? false : true;
-    },
-
-    _hasNoTechStops: function(item) {
-        var hasNoTechStops = true;
-        item.segments.forEach(function(segment) {
-            if (segment.id < 0)
-                hasNoTechStops = false;
-        });
-        return hasNoTechStops;
-    },
-
-    _checkNotes: function(item) {
-        var hasNote = false;
-        item.segments.forEach(function(segment) {
-            if (segment.id < 0) {
-                hasNote = true;
+            _checkOperated: {
+                type: Boolean,
+                value: false
             }
-        });
-        return (!hasNote);
-    },
 
-    _getFlightInformation: function(item) {
-        var component = this;
-        var response = {};
-        var _flightNumbers = [];
-        var _operatingAirlines = [];
-        item.segments.forEach(function(segment) {
-            if (segment.operatingAirline != null && segment.operatingAirline.code != segment.airline.code && segment.operatingAirline.name !== null) {
-                _flightNumbers.push(segment.flightNumber);
-                _operatingAirlines.push(segment.operatingAirline.name);
+        },
+
+        _isChangeOfGauge: function (segment) {
+            return segment.id === -1 || segment.changeOfGaugeInfo != null;
+        },
+
+        _isNotChangeOfGauge: function (segment) {
+            return !(segment.id !== -1 && segment.changeOfGaugeInfo != null);
+        },
+
+        _getAirlineName: function (segment) {
+            var airline = segment.airline;
+            return airline.name + ' ' + airline.code + ' ' + segment.flightNumber;
+        },
+
+        _getSegmentAirports: function (segment) {
+            return segment.departureAirport.code + '>' + segment.arrivalAirport.code;
+        },
+
+        _checklayover: function (layover) {
+            return layover == null;
+        },
+
+        _getDate: function (date) {
+
+            return date.slice(0, 11);
+        },
+
+        _get24HourTime: function (time) {
+            var hours = parseInt(time.substr(0, 2));
+            if (time.indexOf('AM') != -1) {
+                if (hours < 10)
+                    time = '0' + time;
+                if (hours == 12)
+                    time = time.replace('12', '00');
             }
-        });
+            if (time.indexOf('PM') != -1 && hours < 12) {
+                time = time.replace(hours, (hours + 12));
+            }
+            return time.replace(/(AM|PM)/, '');
+        },
 
-        response.flightNumbers = _flightNumbers;
-        response.operatingAirlines = _operatingAirlines;
-        return response;
-    },
+        _getTime: function (dateTime) {
+            var time = this._get24HourTime(dateTime.time);
+            return time;
+        },
 
-    _checkOperated: function(item) {
-        if (item.airline.code !== item.operatingAirline.code && item.operatingAirline && item.operatingAirline.name) {
-            return true;
+        /*To check tech stops at a segment level*/
+        _checkTechStop: function (segment) {
+            return segment.id < 0 ? false : true;
+        },
+
+        _hasNoTechStops: function (item) {
+            var hasNoTechStops = true;
+            item.segments.forEach(function (segment) {
+                if (segment.id < 0)
+                    hasNoTechStops = false;
+            });
+            return hasNoTechStops;
+        },
+
+        _checkNotes: function (item) {
+            var hasNote = false;
+            item.segments.forEach(function (segment) {
+                if (segment.id < 0) {
+                    hasNote = true;
+                }
+            });
+            return (!hasNote);
+        },
+
+        _getFlightInformation: function (item) {
+            var component = this;
+            var response = {};
+            var _flightNumbers = [];
+            var _operatingAirlines = [];
+            item.segments.forEach(function (segment) {
+                if (segment.operatingAirline != null && segment.operatingAirline.code != segment.airline.code && segment.operatingAirline.name !== null) {
+                    _flightNumbers.push(segment.flightNumber);
+                    _operatingAirlines.push(segment.operatingAirline.name);
+                }
+            });
+
+            response.flightNumbers = _flightNumbers;
+            response.operatingAirlines = _operatingAirlines;
+            return response;
+        },
+
+        _checkOperated: function (item) {
+            if (item.airline.code !== item.operatingAirline.code && item.operatingAirline && item.operatingAirline.name) {
+                return true;
+            }
+            return false;
+        },
+
+        _getFormattedTiming: function (time) {
+            var t = "";
+            var day = time / (24 * 60);
+            var hour = (time % (24 * 60)) / 60;
+            var minute = (time % (24 * 60)) % 60;
+            if (parseInt(day) > 0)
+                t = t + parseInt(day) + "d ";
+            if (parseInt(hour) > 0)
+                t = t + parseInt(hour) + "h ";
+            if (parseInt(minute) > 0)
+                t = t + parseInt(minute) + "m ";
+            return t.trim();
         }
-        return false;
-    },
 
-    _getFormattedTiming: function(time) {
-        var t = "";
-        var day = time / (24 * 60);
-        var hour = (time % (24 * 60)) / 60;
-        var minute = (time % (24 * 60)) % 60;
-        if (parseInt(day) > 0)
-            t = t + parseInt(day) + "d ";
-        if (parseInt(hour) > 0)
-            t = t + parseInt(hour) + "h ";
-        if (parseInt(minute) > 0)
-            t = t + parseInt(minute) + "m ";
-        return t.trim();
-    }
-
-})
+    })
 </script>
