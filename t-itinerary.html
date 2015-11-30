@@ -147,7 +147,7 @@
                 <template is="dom-repeat" items="[[item.segments]]" as="segment">
                     <div class="layout horizontal center layover" hidden$=[[_checklayover(segment.layoverInfo)]]>
                         <span class="flex"></span>
-                        <span class="layoverText">Layover:&nbsp;<span>[[_getFormattedTiming(segment.layoverInfo.Duration)]]</span><span class="techStopStar" hidden$=[[_checkTechStop(segment)]]>*</span></span>
+                        <span class="layoverText">Layover:&nbsp;<span>[[_getFormattedTiming(segment.layoverInfo.Duration)]]</span><span class="techStopStar" hidden$=[[_checkTechStop(segment)]]>&npsp;*</span></span>
                         <span class="flex"></span>
                     </div>
                     <div class="flightDetails layout horizontal center">
@@ -249,7 +249,8 @@
         },
 
         _getSegmentAirports: function (segment) {
-            return segment.departureAirport.code + '>' + segment.arrivalAirport.code;
+            if(segment.changeOfGaugeInfo)
+            return segment.departureAirport.code + ' -> ' + segment.changeOfGaugeInfo.FinaleAirport.code;
         },
 
         _checklayover: function (layover) {
