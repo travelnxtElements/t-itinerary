@@ -155,7 +155,7 @@
                         <div class="layout vertical flex">
                             <div class="layout horizontal flex">
                                 <div class="flex">
-                                    <span>[[_getAirlineName(segment)]]</span>
+                                    <span>[[_getAirlineDetail(segment)]]</span>
                                 </div>
                                 <div class="end-justified" hidden$="[[_isNotChangeOfGauge(segment)]]">
                                     <span>[[_getSegmentAirports(segment)]]</span>
@@ -243,9 +243,9 @@
             return !(segment.id !== -1 && segment.changeOfGaugeInfo != null);
         },
 
-        _getAirlineName: function (segment) {
+        _getAirlineDetail: function (segment) {
             var airline = segment.airline;
-            return airline.name + ' ' + airline.code + ' ' + segment.flightNumber;
+            return airline.name + ' ' + airline.code + ' ' + segment.flightNumber + ' | ' + segment.cabinType;
         },
 
         _getSegmentAirports: function (segment) {
