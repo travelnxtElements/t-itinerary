@@ -176,15 +176,13 @@
                             <span class="date flex durationSection">[[_getDate(segment.departureTime.date)]]</span>
                         </div>
                         <div style="width:100px">
-                            <div  class="layout vertical center " hidden$="[[_isChangeOfGauge(segment)]]">
-
-                            <span >
+                            <div class="layout vertical center " hidden$="[[_isChangeOfGauge(segment)]]">
+                                <span>
                                 <iron-icon class="hyphen" icon="schedule"></iron-icon>
                             </span>
-                            <span class="flex"></span>
-                            <span class="totalDuration durationSection self-center">[[_getFormattedTiming(segment.flightDuration)]]</span>
+                                <span class="flex"></span>
+                                <span class="totalDuration durationSection self-center">[[_getFormattedTiming(segment.flightDuration)]]</span>
                             </div>
-
                         </div>
                         <div class="layout vertical textLeft flex end-justified">
                             <span class="flex flightTiming">
@@ -224,6 +222,11 @@
                 type: Array
             },
 
+            showTwelveHourClock: {
+                type: Boolean,
+                value: false
+            },
+
             _operatingAirlines: {
                 type: Array
             },
@@ -249,8 +252,8 @@
         },
 
         _getSegmentAirports: function (segment) {
-            if(segment.changeOfGaugeInfo)
-            return segment.departureAirport.code + ' -> ' + segment.changeOfGaugeInfo.FinaleAirport.code;
+            if (segment.changeOfGaugeInfo)
+                return segment.departureAirport.code + ' -> ' + segment.changeOfGaugeInfo.FinaleAirport.code;
         },
 
         _checklayover: function (layover) {
@@ -275,9 +278,12 @@
             }
             return time.replace(/(AM|PM)/, '');
         },
-
+            
         _getTime: function (dateTime) {
-            var time = this._get24HourTime(dateTime.time);
+            var time = dateTime.time;
+            if (!this.showTwelveHourClock) {
+                time = this._get24HourTime(dateTime.time);
+            }
             return time;
         },
 
