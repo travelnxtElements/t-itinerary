@@ -67,10 +67,16 @@
         .flightTiming {
             font-size: var(--font-16, 16px);
             font-weight: 600;
+            white-space: nowrap;
         }
         
         .cityCodes {
             font-weight: normal;
+            margin-left: 2px;
+        }
+        .textLeft .cityCodes{
+            margin-left: 0;
+            margin-right: 2px;
         }
         
         .durationSection,
@@ -168,13 +174,13 @@
                         </div>
                     </div>
                     <div class="layout horizontal">
-                        <div class="layout vertical textRight flex">
-                            <span class="flex textRight flightTiming">
+                        <div class="textRight flex">
+                            <div class="flex textRight layout horizontal end-justified flightTiming">
                                 <span>[[_getTime(segment.departureTime)]]</span>
-                            <span class="cityCodes">[[segment.departureAirport.code]]</span>
-                            </span>
-                            <span class="date flex durationSection">[[_getDate(segment.departureTime.date)]]</span>
-                            <span class="durationSection">[[segment.departureAirport.name]]</span>
+                                <span class="cityCodes">[[segment.departureAirport.code]]</span>
+                            </div>
+                            <div class="date flex durationSection">[[_getDate(segment.departureTime.date)]]</div>
+                            <div class="durationSection">[[segment.departureAirport.name]]</div>
                         </div>
                         <div style="width:100px">
                             <div class="layout vertical center " hidden$="[[_isChangeOfGauge(segment)]]">
@@ -185,13 +191,13 @@
                                 <span class="totalDuration durationSection self-center">[[_getFormattedTiming(segment.flightDuration)]]</span>
                             </div>
                         </div>
-                        <div class="layout vertical textLeft flex end-justified">
-                            <span class="flex flightTiming">
-                            <span class="cityCodes">[[segment.arrivalAirport.code]]</span>
-                            <span>[[_getTime(segment.arrivalTime)]]</span>
-                            </span>
-                            <span class="date flex textLeft durationSection">[[_getDate(segment.arrivalTime.date)]]</span>
-                            <span class="durationSection">[[segment.arrivalAirport.name]]</span>
+                        <div class="textLeft flex ">
+                            <div class="flex layout horizontal flightTiming">
+                                <span class="cityCodes">[[segment.arrivalAirport.code]]</span>
+                                <span>[[_getTime(segment.arrivalTime)]]</span>
+                            </div>
+                            <div class="date flex textLeft durationSection">[[_getDate(segment.arrivalTime.date)]]</div>
+                            <div class="durationSection">[[segment.arrivalAirport.name]]</div>
                         </div>
                     </div>
                 </template>
