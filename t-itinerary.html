@@ -278,7 +278,7 @@
             if (time.indexOf('PM') != -1 && hours < 12) {
                 time = time.replace(hours, (hours + 12));
             }
-            return time.replace(/(AM|PM)/, '');
+            return time.trim();
         },
             
         _getTime: function (dateTime) {
@@ -286,7 +286,7 @@
             if (!this.showTwelveHourClock) {
                 time = this._get24HourTime(dateTime.time);
             }
-            return time;
+            return time.replace(/(AM|PM)/, '').trim().toLowerCase();
         },
 
         /*To check tech stops at a segment level*/
