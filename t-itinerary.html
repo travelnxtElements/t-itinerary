@@ -174,7 +174,7 @@
                             <span class="cityCodes">[[segment.departureAirport.code]]</span>
                             </span>
                             <span class="date flex durationSection">[[_getDate(segment.departureTime.date)]]</span>
-                            <span>[[segment.departureAirport.name]]</span>
+                            <span class="durationSection">[[segment.departureAirport.name]]</span>
                         </div>
                         <div style="width:100px">
                             <div class="layout vertical center " hidden$="[[_isChangeOfGauge(segment)]]">
@@ -191,7 +191,7 @@
                             <span>[[_getTime(segment.arrivalTime)]]</span>
                             </span>
                             <span class="date flex textLeft durationSection">[[_getDate(segment.arrivalTime.date)]]</span>
-                            <span>[[segment.arrivalAirport.name]]</span>
+                            <span class="durationSection">[[segment.arrivalAirport.name]]</span>
                         </div>
                     </div>
                 </template>
