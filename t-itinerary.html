@@ -278,7 +278,7 @@
             if (time.indexOf('PM') != -1 && hours < 12) {
                 time = time.replace(hours, (hours + 12));
             }
-            return time..replace(/(AM|PM)/, '').trim();
+            return time.replace(/(AM|PM)/, '').trim();
         },
             
         _getTime: function (dateTime) {
