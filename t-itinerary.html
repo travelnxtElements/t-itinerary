@@ -140,6 +140,12 @@
         .note .info {
             color: var(--grey-nine, #999999);
         }
+        .icon-section{
+            width: 90px;
+        }
+        .totalDuration{
+            white-space: nowrap;
+        }
         </style>
         <template is="dom-repeat" items="[[flightData]]">
             <div class="sectionHeader layout horizontal center">
@@ -182,7 +188,7 @@
                             <div class="date flex durationSection">[[_getDate(segment.departureTime.date)]]</div>
                             <div class="durationSection">[[segment.departureAirport.name]]</div>
                         </div>
-                        <div style="width:100px">
+                        <div class="icon-section">
                             <div class="layout vertical center " hidden$="[[_isChangeOfGauge(segment)]]">
                                 <span>
                                 <iron-icon class="hyphen" icon="schedule"></iron-icon>
