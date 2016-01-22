@@ -2,19 +2,15 @@
 <link rel="import" href="../polymer/polymer.html" />
 <link rel="import" href="../iron-flex-layout/classes/iron-flex-layout.html" />
 <link rel="import" href="../iron-icons/iron-icons.html" />
-<link rel="import" href="../t-text-container/t-text-container.html">
+<link rel="import" href="../t-text-container/travel-element-styles.html" />
 <!--
     t-itinerary is a polymer component that generates a itinerary component.
 
-    <div class="demo-canvas">
-        
-    </div>
-
-    <t-itinerary id="flightItinerary" show-twelve-hour-clock></t-itinerary>     
+    `<t-itinerary id="flightItinerary" show-twelve-hour-clock></t-itinerary> `    
 -->
 <dom-module id="t-itinerary">
     <template>
-        <style>
+    <style include="travel-element-styles">
         :host {
             display: block;
         }
@@ -34,10 +30,9 @@
             margin: 0 10px;
         }
         
-        .techStopStar font-bold {
+        .techStopStar {
             vertical-align: text-top;
             padding-right: 2px;
-            font-weight: bold;
         }
         
         .layover {
@@ -91,7 +86,6 @@
             border-color: var(--grey-two, #eeeeee);
         }
         </style>
-        <t-text-container>
             <div class="body primary-light-text font-12">
                 <template is="dom-repeat" items="[[flightData]]">
                     <div class="sectionHeader section layout horizontal center">
@@ -163,7 +157,6 @@
                     </div>
                 </template>
             </div>
-        </t-text-container>
     </template>
 </dom-module>
 <script>
