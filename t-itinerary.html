@@ -1,4 +1,4 @@
-<!-- We are still creating this components -->
+ We are still creating this components -->
 <link rel="import" href="../polymer/polymer.html" />
 <link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html" />
 <link rel="import" href="../iron-icons/iron-icons.html" />
@@ -288,7 +288,7 @@
         },
 
         _checkOperated: function (item) {
-            if (item.airline.code !== item.operatingAirline.code && item.operatingAirline && item.operatingAirline.name) {
+            if (item.operatingAirline && item.airline.code !== item.operatingAirline.code && item.operatingAirline.name) {
                 return true;
             }
             return false;
