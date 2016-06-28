@@ -1,4 +1,4 @@
-We are still creating this components -->
+<!--We are still creating this components -->
 <link rel="import" href="../polymer/polymer.html" />
 <link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html" />
 <link rel="import" href="../iron-icons/iron-icons.html" />
@@ -162,12 +162,22 @@ We are still creating this components -->
                 </div>
             </template>
             <div class="border-bottom"></div>
-            <div class="section-small layout horizontal font-12 flex">
-                <t-itinerary-fare-rules label="Fare Rules" api-relative-url="[[apiRelativeUrl]]" api-base-url="[[baseApiUrl]]" auth-token="[[authToken]]" search-id="[[searchId]]" inventory-id="[[inventoryId]]">
-                </t-itinerary-fare-rules>
-                <span>&nbsp;|&nbsp;</span>
-                <t-itinerary-baggage-policies label="Baggage Information" api-base-url="[[baseApiUrl]]" auth-token="[[authToken]]" airline-codes="[[_setAirlineCodes(flightData)]]" baggage-url="[[baggageUrl]]">
-                </t-itinerary-baggage-policies>
+            <div class="layout horizontal center font-12 flex">
+                <template is="dom-if" if="[[showFareRules]]">
+                    <div class="section-small">
+                        <t-itinerary-fare-rules label="Fare Rules" api-relative-url="[[apiRelativeUrl]]" api-base-url="[[baseApiUrl]]" auth-token="[[authToken]]" search-id="[[searchId]]" inventory-id="[[inventoryId]]">
+                        </t-itinerary-fare-rules>
+                    </div>
+                </template>
+                <template is="dom-if" if="[[_checkBothRules(showFareRules,showBaggageRules)]]">
+                    <span>|</span>
+                </template>
+                <template is="dom-if" if="[[showBaggageRules]]">
+                    <div class="section-small">
+                        <t-itinerary-baggage-policies label="Baggage Information" api-base-url="[[baggageBaseUrl]]" auth-token="[[authToken]]" airline-codes="[[_setAirlineCodes(flightData)]]" baggage-url="[[baggageUrl]]">
+                        </t-itinerary-baggage-policies>
+                    </div>
+                </template>
             </div>
         </div>
     </template>
@@ -223,8 +233,26 @@ Polymer({
          */
         baggageUrl: String,
 
+        /**
+         * Mandatory field if Baggage policies are required
+         */
+        baggageBaseUrl: String,
+
+
         /*Pass true to switch to 12 hour clock*/
         showTwelveHourClock: {
+            type: Boolean,
+            value: false
+        },
+
+        /*Pass true to show Fare rules*/
+        showFareRules: {
+            type: Boolean,
+            value: false
+        },
+
+        /*Pass true to show Baggage rules*/
+        showBaggageRules: {
             type: Boolean,
             value: false
         },
@@ -240,8 +268,11 @@ Polymer({
         _checkOperated: {
             type: Boolean,
             value: false
-        }
+        },
+    },
 
+    _checkBothRules: function(showFareRules,showBaggageRules){
+        return showFareRules && showBaggageRules;
     },
 
     _setAirlineCodes: function(legs) {
