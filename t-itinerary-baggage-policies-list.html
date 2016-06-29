@@ -42,7 +42,7 @@
                     <t-loader active></t-loader>
                 </div>
             </template>
-            <template is="dom-if" if="[[baggagePolicies]]">
+            <template is="dom-if" if="[[_showBaggagePolicies]]">
                 <div class="margin-bottom-medium">
                     <div class="font-semi margin-bottom">
                         Airline baggage charges/fees
@@ -52,20 +52,27 @@
                     </div>
                 </div>
                 <div class="devider border-bottom margin-bottom-medium"></div>
-                <div class="layout horizontal font-semi  margin-bottom-10">
-                    <div class="flex">
-                        Airline Name
+                <template is="dom-if" if="[[baggagePolicies]]">
+                    <div class="layout horizontal font-semi  margin-bottom-10">
+                        <div class="flex">
+                            Airline Name
+                        </div>
+                        <div class="airlineCode">
+                            Airline Code
+                        </div>
                     </div>
-                    <div class="airlineCode">
-                        Airline Code
-                    </div>
-                </div>
-                <template is="dom-repeat" items="[[baggagePolicies]]">
-                    <div class=" layout horizontal  margin-bottom-10">
-                        <a class="link-style flex" target="_blank" href$="[[item.policyLink]]">
-                            [[item.airlineName]]
-                        </a>
-                        <div class="text-center airlineCode secondary-text">[[item.airlineCode]]</div>
+                    <template is="dom-repeat" items="[[baggagePolicies]]">
+                        <div class=" layout horizontal  margin-bottom-10">
+                            <a class="link-style flex" target="_blank" href$="[[item.policyLink]]">
+                                [[item.airlineName]]
+                            </a>
+                            <div class="text-center airlineCode secondary-text">[[item.airlineCode]]</div>
+                        </div>
+                    </template>
+                </template>
+                <template is="dom-if" if="[[!baggagePolicies]]">
+                    <div class="layout horizontal margin-bottom-10">
+                        Sorry, Airline baggage information unavailable. Please check with airlines directly.
                     </div>
                 </template>
             </template>
@@ -87,23 +94,27 @@ Polymer({
 
     _baggagePoliciesFailed: false,
 
+    _showBaggagePolicies: false,
     /**
      * This method will initiate a call to show fare rules
      */
     showBaggagePolicies: function() {
         this._baggagePoliciesLoading = true;
         this._baggagePoliciesFailed = false;
-        this.policies = null;
+        this._showBaggagePolicies = false;
+        this.baggagePolicies = null;
     },
 
     onBaggagePoliciesSuccess: function(event) {
         this._baggagePoliciesLoading = false;
         this._baggagePoliciesFailed = false;
-        this.baggagePolicies = event.detail;
+        this._showBaggagePolicies = true;
+        this.baggagePolicies = event.detail.baggageData;
     },
 
     onBaggagePoliciesError: function(event) {
         this._baggagePoliciesLoading = false;
+        this._showBaggagePolicies = false;
         this._baggagePoliciesFailed = true;
 
     }

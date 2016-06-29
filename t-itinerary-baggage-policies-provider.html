@@ -39,7 +39,6 @@
         },
 
         getBaggagePolicies: function () {
-            var provider = this;
 
             var buildReq = function (provider) {
                 var serviceModel = {
@@ -63,20 +62,17 @@
         _successCallback: function (event) {
             if (!event.detail.response || !event.detail.response.status)
                 this.fire('baggage-policies-error', 'Operation error occured, please try again.', { bubbles: false });
-            else if (!event.detail.response.status.isSuccessful || !event.detail.response.baggageData) {
+            else if (!event.detail.response.status.isSuccessful) {
                 this.fire('baggage-policies-error', event.detail.response.status.message, { bubbles: false });
             }
             else {
-                this.fire('baggage-policies-success', this._getUIBaggagePolicies(event.detail.response.baggageData), { bubbles: false });
+                this.fire('baggage-policies-success', event.detail.response, { bubbles: false });
             }
         },
 
         _errorCallback: function (event) {
             this.fire('baggage-policies-error', 'Connection error occured, please try again.', { bubbles: false })
-        },
-
-        _getUIBaggagePolicies: function (policies) {
-            return policies;
         }
+
     })
 </script>
