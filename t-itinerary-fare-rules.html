@@ -28,7 +28,7 @@
     </style>
         <label class="link-style" on-tap="_initiateFareCall">[[label]]</label>
         
-        <t-overlay id="overlay" header="Fare Rules">
+        <t-overlay id="overlay" header="Fare Rules" icon="[[headerBackIcon]]">
             <t-itinerary-fare-rules-list>
 
             </t-itinerary-fare-rules-list>
@@ -69,6 +69,11 @@
             apiRelativeUrl: {
                 type: String,
                 value: 'api/Flight/results/single/fareRules'
+            },
+
+            headerBackIcon: {
+                type: String,
+                value: 'arrow-left'
             }
         },
 
