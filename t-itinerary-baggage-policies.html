@@ -28,7 +28,7 @@
     </style>
         <label class="link-style" on-tap="_initiateBaggageCall">[[label]]</label>
         
-        <t-overlay id="overlay" header="[[label]]">
+        <t-overlay id="overlay" header="[[label]]" icon="[[headerBackIcon]]">
             <t-itinerary-baggage-policies-list>
 
             </t-itinerary-baggage-policies-list>
@@ -68,6 +68,11 @@
             apiRelativeUrl: {
                 type: String,
                 value: ''
+            },
+
+            headerBackIcon: {
+                type: String,
+                value: 'arrow-left'
             }
         },
 
