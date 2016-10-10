@@ -276,6 +276,9 @@ Polymer({
     },
 
     _setAirlineCodes: function(legs) {
+        if (!legs || !legs.length) {
+            return;
+        }
         var airlineCodes = [];
         legs.forEach(function(leg) {
             leg.segments.forEach(function(segment) {
